@@ -1,22 +1,26 @@
 import sys
 import webbrowser
 from time import gmtime, strftime
+
+from output_helper import (output_bing_ads_webfault_error,
+                           output_status_message, output_webfault_errors)
 from suds import WebFault
 
-from bingads.service_client import ServiceClient
 from bingads.authorization import *
+from bingads.service_client import ServiceClient
 from bingads.v13 import *
 
-from output_helper import output_bing_ads_webfault_error, output_webfault_errors, output_status_message
+ENVIRONMENT='production' 
 
-# Required
-DEVELOPER_TOKEN='BBD37VB98' # Universal token for sandbox
-ENVIRONMENT='sandbox' # If you use 'production' then you must also update the DEVELOPER_TOKEN value.
 
-# The CLIENT_ID is required and CLIENT_STATE is recommended.
-# The REFRESH_TOKEN should always be in a secure location.
-CLIENT_ID='4c0b021c-00c3-4508-838f-d3127e8167ff'
-CLIENT_STATE='ClientStateGoesHere'
+CLIENT_ID="xxxx"
+CLIENT_SECRET = "xxxx"
+
+REDIRECTION_URI = "xxxx"
+DEVELOPER_TOKEN="xxxx" 
+
+
+CLIENT_STATE='12345'
 REFRESH_TOKEN="refresh.txt"
 
 ALL_CAMPAIGN_TYPES=['Audience Search Shopping']
@@ -29,11 +33,6 @@ ALL_AD_TYPES={
 
 def authenticate(authorization_data):
     
-    # import logging
-    # logging.basicConfig(level=logging.INFO)
-    # logging.getLogger('suds.client').setLevel(logging.DEBUG)
-    # logging.getLogger('suds.transport.http').setLevel(logging.DEBUG)
-
     customer_service=ServiceClient(
         service='CustomerManagementService', 
         version=13,
@@ -57,9 +56,11 @@ def authenticate(authorization_data):
  
 def authenticate_with_oauth(authorization_data):
     
-    authentication=OAuthDesktopMobileAuthCodeGrant(
+    authentication = OAuthWebAuthCodeGrant(
         client_id=CLIENT_ID,
-        env=ENVIRONMENT
+        client_secret= CLIENT_SECRET,
+        redirection_uri=REDIRECTION_URI,
+        env=ENVIRONMENT,
     )
 
     # It is recommended that you specify a non guessable 'state' request parameter to help prevent

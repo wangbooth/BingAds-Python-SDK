@@ -1,3 +1,5 @@
+import traceback
+
 from auth_helper import *
 from campaignmanagement_example_helper import *
 
@@ -13,10 +15,10 @@ def main(authorization_data):
         campaign.BudgetType='DailyBudgetStandard'
         campaign.DailyBudget=50
         languages=campaign_service.factory.create('ns3:ArrayOfstring')
-        languages.string.append('All')
+        languages.string.append('SimplifiedChinese')
         campaign.Languages=languages
-        campaign.Name="Women's Shoes " + strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
-        campaign.TimeZone='PacificTimeUSCanadaTijuana'
+        campaign.Name="测试活动" + strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+        campaign.TimeZone='BeijingChongqingHongKongUrumqi'
         campaigns.Campaign.append(campaign)
 
         output_status_message("-----\nAddCampaigns:")
@@ -149,17 +151,18 @@ def main(authorization_data):
         
         # Delete the campaign and everything it contains e.g., ad groups and ads.
 
-        output_status_message("-----\nDeleteCampaigns:")
-        campaign_service.DeleteCampaigns(
-            AccountId=authorization_data.account_id,
-            CampaignIds=campaign_ids
-        )
-        output_status_message("Deleted Campaign Id {0}".format(campaign_ids['long'][0]))
+        # output_status_message("-----\nDeleteCampaigns:")
+        # campaign_service.DeleteCampaigns(
+        #     AccountId=authorization_data.account_id,
+        #     CampaignIds=campaign_ids
+        # )
+        # output_status_message("Deleted Campaign Id {0}".format(campaign_ids['long'][0]))
 
     except WebFault as ex:
         output_webfault_errors(ex)
     except Exception as ex:
         output_status_message(ex)
+        print(traceback.print_stack())
 
 # Main execution
 if __name__ == '__main__':
@@ -173,13 +176,16 @@ if __name__ == '__main__':
         authentication=None,
     )
 
+    authenticate(authorization_data)
+    
     campaign_service=ServiceClient(
         service='CampaignManagementService', 
         version=13,
         authorization_data=authorization_data, 
         environment=ENVIRONMENT,
     )
-        
-    authenticate(authorization_data)
+
+    
+    
         
     main(authorization_data)
