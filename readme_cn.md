@@ -38,7 +38,6 @@
 
 # 转化跟踪
 
-
 [转化跟踪](https://ui.ads.microsoft.com/campaign/vnext/conversiongoals?aid=176507923&ccuisrc=4&cid=253408536&uid=134481084)通过跟踪用户在点击您的广告后在您的网站上采取的行为，来衡量您的广告活动的投资回报率。当这个行为符合您的转化目标时，它就被计算为一个转化。
 
 ![image.png](./examples/v13/images/image.png)
@@ -104,6 +103,5 @@
 Python 代码示例：https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/offline_conversions.py
 
 
-
-可以参考 https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/offline_conversions.py，将转化数据回传至对应的转化目标。
+可以参考 [examples/v13/offline_conversions.py](https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/offline_conversions.py)，将转化数据回传至对应的转化目标。
 
