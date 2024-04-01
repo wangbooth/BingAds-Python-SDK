@@ -26,13 +26,11 @@
 
 > 开发者令牌需要用户在微软 Ads 开发者门户页面上生成，只有超级管理员有权限生成这个，需联系一级代理商来生成。
 
-### 创建响应式搜索广告示例
+### Demo
 
-官方有提供的 Python SDK: bingads，官方文档：https://learn.microsoft.com/en-us/advertising/guides/get-started-python?view=bingads-13
+第一步，需要参考 https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/auth_helper.py，设置代码中的 CLIENT_ID、CLIENT_SECRET、REDIRECTION_URI 和 DEVELOPER_TOKEN 为实际值。
 
-已针对中国用户做了一个示例脚本供参考：https://github.com/wangbooth/BingAds-Python-SDK/tree/bing_cn
+然后，可以参考 https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/responsive_search_ads.py，创建响应式搜索广告，实现账户基建工作。
 
-参考 examples/v13/auth_helper.py，设置 CLIENT_ID、CLIENT_SECRET、REDIRECTION_URI 和 DEVELOPER_TOKEN 为实际值。
-
-参考 examples/v13/responsive_search_ads.py，创建响应式搜索广告
+可以参考 https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/offline_conversions.py，将转化数据回传至对应的转化目标。
 
