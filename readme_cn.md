@@ -271,3 +271,217 @@ Python 代码示例：https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_
 
 可以参考 [examples/v13/offline_conversions.py](https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/offline_conversions.py)，将转化数据回传至对应的转化目标。
 
+## 账户基础数据报表 或 每日消费数据报表
+
+### 第一步 通过 GetUser 获取 UserID
+- 示例代码在上文相关代码处
+
+### 第二步 通过 UserID 调用 SearchAccounts 获取 Account ID 和 Customer ID
+#### 请求头数据准备：
+- AuthenticationToken：广告账户 OAuth 认证过后的访问令牌
+- DeveloperToken：开发者令牌
+
+#### 请求数据准备：
+
+- Ordering：排序规则
+- PageInfo：每页结果的索引和大小。
+- Predicates：返回帐户必须满足的所有条件。
+- ReturnAdditionalFields：包含在每个返回帐户中的其他属性列表
+
+示例代码在上文相关代码处
+
+文档地址：https://learn.microsoft.com/en-us/advertising/customer-management-service/searchaccounts?view=bingads-13
+
+### 第三步 通过Account ID 请求报告
+
+#### 请求头数据准备：
+
+- AuthenticationToken：广告账户 OAuth 认证过后的访问令牌
+- CustomerAccountId，广告账户 ID
+- CustomerId：客户 ID
+- DeveloperToken，开发者令牌
+
+#### 请求数据准备：
+
+- Aggregation：报告聚合类型（天或小时）
+- Columns：报告参数列
+- Filter：过滤报告数据（您可以使用过滤器仅包含搜索广告的数据）
+- Scope：报告的实体范围（账户ID或活动）
+- Time：报告使用的时间段，时区
+- ExcludeColumnHeaders：下载的报告是否应包含每列的标题描述
+- ExcludeReportFooter：下载的报告是否应包含页脚
+- ExcludeReportHeader：下载的报告是否应包含报告头
+- Format：报告数据的格式
+- FormatVersion：确定下载报告文件中某些字段的格式
+- ReportName：报告的名称
+- ReturnOnlyCompleteData：确定服务是否必须确保所有数据都已处理且可用
+
+```
+# 使用pythonSDk
+report_request=get_report_request(authorization_data.account_id)
+reporting_download_parameters = ReportingDownloadParameters(
+    report_request=report_request,
+    result_file_directory = FILE_DIRECTORY,
+    result_file_name = RESULT_FILE_NAME,
+    overwrite_result_file = True, # Set this value true if you want to overwrite the same file.
+    timeout_in_milliseconds=TIMEOUT_IN_MILLISECONDS # You may optionally cancel the download after a specified time interval.
+)
+download_report(reporting_download_parameters)
+```
+示例代码:[examples/v13/report_requests.py](https://github.com/wangbooth/BingAds-Python-SDK/blob/bing_cn/examples/v13/report_requests.py)
+
+文档地址：https://learn.microsoft.com/en-us/advertising/reporting-service/campaignperformancereportrequest?view=bingads-13
+
+
+## 余额报表
+
+### 第一步 通过 GetUser 获取 UserID
+- 同 账户基础数据报表 第一步
+
+### 第二步 通过 UserID 调用 SearchAccounts 获取 Account ID 和 Customer ID
+- 同 账户基础数据报表 第二步
+
+### 第三步 通过Account ID 请求报告
+#### 请求数据准备：
+- Ordering：排序规则
+- PageInfo：每页结果的索引和大小。
+- Predicates：返回帐户必须满足的所有条件。
+- ReturnAdditionalFields：包含在每个返回帐户中的其他属性列表
+
+```
+wsdl_url = "https://clientcenter.api.bingads.microsoft.com/Api/Billing/v13/CustomerBillingService.svc?wsdl"
+headers = {
+    'Content-Type': 'text/xml; charset=utf-8',
+    'SOAPAction': 'SearchInsertionOrders'
+}
+
+body = f'''<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Header xmlns="https://bingads.microsoft.com/Billing/v13">
+    <Action mustUnderstand="1">SearchInsertionOrders</Action>
+    <AuthenticationToken i:nil="false">{access_token}</AuthenticationToken>
+    <DeveloperToken i:nil="false">{DEVELOPER_TOKEN}</DeveloperToken>
+  </s:Header>
+  <s:Body>
+    <SearchInsertionOrdersRequest xmlns="https://bingads.microsoft.com/Billing/v13">
+      <Predicates xmlns:e14="https://bingads.microsoft.com/Customer/v13/Entities" i:nil="false">
+        <e14:Predicate>
+          <e14:Field i:nil="false">AccountId</e14:Field>
+          <e14:Operator>Equals</e14:Operator>
+          <e14:Value i:nil="false">{account_id}</e14:Value>
+        </e14:Predicate>
+      </Predicates>
+      <Ordering xmlns:e15="https://bingads.microsoft.com/Customer/v13/Entities" i:nil="false">
+        <e15:OrderBy>
+          <e15:Field>Id</e15:Field>
+          <e15:Order>Ascending</e15:Order>
+        </e15:OrderBy>
+      </Ordering>
+      <PageInfo xmlns:e16="https://bingads.microsoft.com/Customer/v13/Entities" i:nil="false">
+        <e16:Index>0</e16:Index>
+        <e16:Size>10</e16:Size>
+      </PageInfo>
+      <ReturnAdditionalFields i:nil="false">None</ReturnAdditionalFields>
+    </SearchInsertionOrdersRequest>
+  </s:Body>
+</s:Envelope>'''
+
+# 发送请求
+response = requests.post(wsdl_url, headers=headers, data=body)
+
+print(response.text)
+#每个订单状态Status为"Active"的 BudgetRemaining 总和为账户余额
+```
+
+账户余额：每个订单状态Status为"Active"的 BudgetRemaining 总和
+
+
+文档地址：https://learn.microsoft.com/en-us/advertising/customer-billing-service/searchinsertionorders?view=bingads-13
+
+## 活动预算报表
+### 第一步 通过 GetUser 获取 UserID
+- 同 账户基础数据报表 第一步
+
+### 第二步 通过 UserID 调用 SearchAccounts 获取 Account ID 和 Customer ID
+- 同 账户基础数据报表 第二步
+
+### 第三步 通过Account ID 请求报告
+#### 请求数据准备：
+- AccountId
+- CampaignType：默认值为搜索，即只返回搜索活动
+- ReturnAdditionalFields：包含在每个返回帐户中的其他属性列表
+
+```
+# 使用pythonSDK
+data_list = []
+campaigns=campaign_service.GetCampaignsByAccountId(
+                AccountId=authorization_data.account_id,
+                CampaignType=ALL_CAMPAIGN_TYPES)
+
+for campaign in campaigns['Campaign']:
+    if campaign.Status == "Active" or campaign.Status == "BudgetPaused":
+        data_list.append([
+            account_id,
+            campaign.Name,
+            campaign.Status,
+            campaign.BudgetType,
+            campaign.DailyBudget,
+            campaign.ExperimentId,
+            campaign.FinalUrlSuffix,
+            campaign.SubType,
+            campaign.TrackingUrlTemplate,
+            campaign.UrlCustomParameters,
+            campaign.CampaignType,
+            campaign.BudgetId,
+            campaign.AudienceAdsBidAdjustment,
+            campaign.Id
+        ])
+
+    # campaign.Id：广告活动id
+    # campaign.Name：广告活动名称
+    # campaign.DailyBudget：广告活动日预算
+    # campaign.Status：广告活动状态
+
+```
+广告活动预算：广告状态为 Active 或 BudgetPaused 的 campaign.DailyBudget 就是有效的广告活动预算
+账户日预算：同一个账户下的所有广告状态为 Active 或 BudgetPaused 的 campaign.DailyBudget 总和就是有效的账户日预算
+文档地址：https://learn.microsoft.com/en-us/advertising/campaign-management-service/getcampaignsbyaccountid?view=bingads-13
+
+
+## 关键词报表
+### 第一步 通过 GetUser 获取 UserID
+- 同 账户基础数据报表 第一步
+
+### 第二步 通过 UserID 调用 SearchAccounts 获取 Account ID 和 Customer ID
+- 同 账户基础数据报表 第二步
+
+### 第三步 通过Account ID 请求报告
+
+#### 请求头数据准备：
+
+- AuthenticationToken：广告账户 OAuth 认证过后的访问令牌
+- CustomerAccountId，广告账户 ID
+- CustomerId：客户 ID
+- DeveloperToken，开发者令牌
+
+#### 请求数据准备：
+
+- Aggregation：报告聚合类型（天或小时）
+- Columns：报告参数列
+- Filter：过滤报告数据（您可以使用过滤器仅包含搜索广告的数据）
+- Scope：报告的实体范围（账户ID或活动）
+- Time：报告使用的时间段，时区
+- ExcludeColumnHeaders：下载的报告是否应包含每列的标题描述
+- ExcludeReportFooter：下载的报告是否应包含页脚
+- ExcludeReportHeader：下载的报告是否应包含报告头
+- Format：报告数据的格式
+- FormatVersion：确定下载报告文件中某些字段的格式
+- ReportName：报告的名称
+- ReturnOnlyCompleteData：确定服务是否必须确保所有数据都已处理且可用
+
+可以根据时间和聚合方式完成（周时段，日报，周报等报表）
+
+文档地址：https://learn.microsoft.com/en-us/advertising/reporting-service/keywordperformancereportrequest?view=bingads-13
+
+
+
